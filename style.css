@@ -1,0 +1,258 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background: black;
+  overflow: hidden;
+  font-family: "Press Start 2P", monospace;
+}
+
+/* START overlay */
+#start-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: black;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  z-index: 40;
+  padding-bottom: 60px;
+  animation: fadeIn 1s ease-in;
+}
+
+#start-image {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: black;
+  z-index: 39;
+}
+
+#start-button {
+  position: relative;
+  z-index: 41;
+  padding: 15px 40px;
+  font-size: 18px;
+  font-family: "Press Start 2P", monospace;
+  letter-spacing: 2px;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.6);
+  border: 3px solid #fff;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.25s;
+  animation: blink 1.5s infinite;
+  text-shadow: 0 0 5px #fff;
+}
+
+#start-button:hover {
+  background: #fff;
+  color: #000;
+  animation: none;
+}
+
+@keyframes blink {
+  50% { opacity: 0.4; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* GAME CONTAINER */
+#game-container {
+  width: 100vw;
+  height: 100vh;
+  display: none; /* becomes visible after start pressed */
+  position: relative;
+  background: black;
+}
+
+/* Add blur when popup is open */
+#game-container.blurred {
+  filter: blur(4px) brightness(0.6);
+  transition: filter 250ms ease;
+}
+
+#letter-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100000; /* 🔥 make sure it's above Phaser canvas */
+}
+
+#letter-popup.hidden {
+  display: none;
+}
+
+/* Retro pixel envelope style */
+/* --- Retro black envelope popup --- */
+#popup-content {
+  position: relative;
+  background: #000;                /* Black background */
+  border: 3px solid #ffffff;       /* White pixel border */
+  border-radius: 6px;
+  padding: 30px 25px;
+  font-family: "Press Start 2P", monospace;
+  color: #ffffff;                  /* White text */
+  font-size: 11px;
+  line-height: 1.6;
+  text-align: left;
+  box-shadow: 0 0 20px rgba(255,255,255,0.2);
+  image-rendering: pixelated;
+  animation: popupFade 0.4s ease-out;
+}
+
+/* --- Retro triangle flap (envelope top) --- */
+#popup-content::before {
+  content: "";
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 25px solid transparent;
+  border-right: 25px solid transparent;
+  border-bottom: 18px solid #ffffff; /* White flap */
+}
+
+/* --- Pixel white border frame for old CRT vibe --- */
+#popup-content::after {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  border: 2px solid #333;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* --- Subtle appear animation --- */
+@keyframes popupFade {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+
+#popup-close {
+  margin-top: 20px;
+  font-family: inherit;
+  background: #ff6b81;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+#popup-close:hover {
+  background: #ff4757;
+}
+
+.blurred {
+  filter: blur(5px);
+  transition: filter 0.3s ease;
+}
+
+@keyframes popupFade {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* LETTER TEXT */
+.popup-text {
+  color: #ffffff;
+  font-family: "Press Start 2P", monospace;
+  font-size: 12px;
+  text-align: left;
+  white-space: pre-wrap;
+  max-height: 340px;
+  overflow-y: auto;
+  padding: 6px 8px;
+  line-height: 1.8;
+}
+
+/* INSTRUCTION */
+.popup-instr {
+  color: #ffff88;
+  font-family: "Press Start 2P", monospace;
+  font-size: 10px;
+  text-align: center;
+  opacity: 0.9;
+}
+
+/* Make popup crisp (retro pixels) */
+.popup-content, .popup-text, .popup-instr {
+  image-rendering: pixelated;
+}
+
+/* Responsive tweaks */
+@media (max-width: 480px) {
+  .popup-content { padding: 12px; }
+  .popup-text { font-size: 10px; max-height: 240px; }
+  .popup-instr { font-size: 9px; }
+}
+
+/* Optional CRT glow effect (makes it feel old-school retro) */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.02),
+    rgba(255,255,255,0.02) 1px,
+    transparent 2px,
+    transparent 3px
+  );
+  mix-blend-mode: overlay;
+  opacity: 0.4;
+}
+
+#music-button {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 45px;
+  height: 45px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid #fff;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 20px;
+  text-align: center;
+  line-height: 42px;
+  cursor: pointer;
+  z-index: 99999;
+  font-family: "Press Start 2P", monospace;
+  transition: background 0.2s, transform 0.2s;
+}
+
+#music-button:hover {
+  background: #fff;
+  color: #000;
+  transform: scale(1.1);
+}

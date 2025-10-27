@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Retro Game for Ikay</title>
+  <link rel="icon" type="image/png" href="logo.png" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+</head>
+<body>
+  <!-- START OVERLAY -->
+  <div id="start-overlay">
+    <img id="start-image" src="start-screen.png" alt="Start screen" />
+    <button id="start-button">START</button>
+  </div>
+
+  <!-- GAME CONTAINER -->
+  <div id="game-container"></div>
+  <div id="music-button">🎵</div>
+
+
+  <!-- LETTER POPUP -->
+<!-- Letter Popup -->
+<!-- 💌 LETTER POPUP -->
+<div id="letter-popup" class="hidden">
+  <div id="popup-content">
+    <div id="popup-letter-text">This is a test letter.</div>
+    <button id="popup-close">Close</button>
+  </div>
+</div>
+</div>
+
+  <script src="game.js"></script>
+</body>
+</html>
