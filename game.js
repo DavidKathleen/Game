@@ -109,14 +109,13 @@ menuMusic.volume = 0.4;
 
     new Phaser.Game(config);
 
-    // 🔹 Make game resize dynamically when browser window changes
     window.addEventListener("resize", () => {
-      const game = Phaser.GAMES[0]; // get the first (and only) game instance
+      const game = Phaser.GAMES[0]; 
       if (game && game.scale) {
       game.scale.resize(window.innerWidth, window.innerHeight);
 
-    // Optional: adjust camera and background
-    const scene = game.scene.getScenes(true)[0]; // current active scene
+    
+    const scene = game.scene.getScenes(true)[0]; 
     if (scene && scene.bg) {
       scene.bg.setDisplaySize(window.innerWidth, window.innerHeight);
     }
@@ -124,7 +123,7 @@ menuMusic.volume = 0.4;
 });
 
 
-    // bg music //
+    
     const gameMusic = new Audio("bgmusic.mp3");
     gameMusic.loop = true;
     gameMusic.volume = 0.5;
@@ -238,17 +237,17 @@ menuMusic.volume = 0.4;
   c.setScale(0.15);
   c.body.allowGravity = false;
 
-  // 🍒 Floating animation (up-down motion)
+ 
   this.tweens.add({
     targets: c,
     y: pos.y - 20,
-    duration: 1500 + index * 200, // each cherry has slightly different rhythm
+    duration: 1500 + index * 200,
     yoyo: true,
     repeat: -1,
     ease: "Sine.easeInOut"
   });
 
-  // 🍒 Optional side-to-side motion (adds variation)
+  
   this.tweens.add({
     targets: c,
     x: pos.x + Phaser.Math.Between(-15, 15),
