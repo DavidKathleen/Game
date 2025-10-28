@@ -87,7 +87,7 @@ menuMusic.volume = 0.4;
 
   function startGame() {
     menuMusic.pause();
-menuMusic.currentTime = 0;
+    menuMusic.currentTime = 0;
     const TOTAL_LEVELS = 8;
 
     const config = {
@@ -109,6 +109,21 @@ menuMusic.currentTime = 0;
 
     new Phaser.Game(config);
 
+    // 🔹 Make game resize dynamically when browser window changes
+    window.addEventListener("resize", () => {
+      const game = Phaser.GAMES[0]; // get the first (and only) game instance
+      if (game && game.scale) {
+      game.scale.resize(window.innerWidth, window.innerHeight);
+
+    // Optional: adjust camera and background
+    const scene = game.scene.getScenes(true)[0]; // current active scene
+    if (scene && scene.bg) {
+      scene.bg.setDisplaySize(window.innerWidth, window.innerHeight);
+    }
+  }
+});
+
+
     // bg music //
     const gameMusic = new Audio("bgmusic.mp3");
     gameMusic.loop = true;
@@ -118,16 +133,16 @@ menuMusic.currentTime = 0;
     const musicBtn = document.getElementById("music-button");
     let musicOn = true;
 
-musicBtn.addEventListener("click", () => {
-  if (musicOn) {
-    gameMusic.pause();
-    musicBtn.textContent = "🔇";
-  } else {
-    gameMusic.play();
-    musicBtn.textContent = "🎵";
-  }
-  musicOn = !musicOn;
-});
+    musicBtn.addEventListener("click", () => {
+      if (musicOn) {
+      gameMusic.pause();
+      musicBtn.textContent = "🔇";
+    } else {
+      gameMusic.play();
+      musicBtn.textContent = "🎵";
+    }
+      musicOn = !musicOn;
+    });
 
 
     function createScenesArray(total) {
@@ -160,6 +175,13 @@ musicBtn.addEventListener("click", () => {
 
           this.bg = this.add.image(0, 0, "background").setOrigin(0).setDisplaySize(w, h);
           createStoneTexture(this);
+
+        this.scale.on('resize', (gameSize) => {
+        const width = gameSize.width;
+        const height = gameSize.height;
+        if (this.bg) this.bg.setDisplaySize(width, height);
+        }, this);
+
 
           const raiseBy = window.innerHeight / 15;
           this.ground = this.physics.add.staticGroup();
@@ -211,11 +233,32 @@ musicBtn.addEventListener("click", () => {
             { x: w * 0.3, y: h - 590 },
           ];
 
-          cherryData.forEach(pos => {
-            const c = this.cherries.create(pos.x, pos.y, "cherry");
-            c.setScale(0.15);
-            c.body.allowGravity = false;
-          });
+          cherryData.forEach((pos, index) => {
+  const c = this.cherries.create(pos.x, pos.y, "cherry");
+  c.setScale(0.15);
+  c.body.allowGravity = false;
+
+  // 🍒 Floating animation (up-down motion)
+  this.tweens.add({
+    targets: c,
+    y: pos.y - 20,
+    duration: 1500 + index * 200, // each cherry has slightly different rhythm
+    yoyo: true,
+    repeat: -1,
+    ease: "Sine.easeInOut"
+  });
+
+  // 🍒 Optional side-to-side motion (adds variation)
+  this.tweens.add({
+    targets: c,
+    x: pos.x + Phaser.Math.Between(-15, 15),
+    duration: 2000 + index * 100,
+    yoyo: true,
+    repeat: -1,
+    ease: "Sine.easeInOut"
+  });
+});
+
 
           this.collectedCount = 0;
           this.totalCherries = this.cherries.getChildren().length;
@@ -244,7 +287,7 @@ musicBtn.addEventListener("click", () => {
             "Sometimes i look at you and think, 'How did i get so lucky?' You make my world brighter without even trying. You make my heart feel safe in a way nothing else ever has. \n  \n You are my favorite feeling, my sweetest peace.",
             "I know we’ll face hard days too, but i want you to remember this, I’ll always choose you. Through every high and low, every distance or doubt, i’ll be here, loving you the best way i can, every single day.",
             "I’m sorry if i’m a little makulit sometimes or if i make things harder for you. But please know, i’m learning.\n I’m trying to be better, not just for myself, but for you. You deserve to be loved at my best, and that’s exactly what I’m working on every day. \n  \nThank you for being patient with me, love.",
-            "words aren't enough to express how grateful i am.\n  \nThank you for being the most hardworking peroson i know. You've spoiled me not just with gifts, but with consistency, effort and genuine care. You've held me through the high and lows, stood by me when i couldn't even stand on my own. You taught me how to love unconditionally, and i never thought i could love someone so deeply.\n You showed me just how big my heart can be.\n \n Thank you for your patience, time, effort, and understanding. I love you with all my heart."
+            "words aren't enough to express how grateful i am.\n  \nThank you for being the most hardworking peroson i know. You've spoiled me not just with gifts, but with consistency, effort and genuine care. You've held me through the high and lows, stood by me when i couldn't even stand on my own. You taught me how to love unconditionally, and i never thought i could love someone so deeply. You showed me just how big my heart can be.\n \n Thank you for your patience, time, effort, and understanding. I love you with all my heart."
           ];
 
           this.cursors = this.input.keyboard.createCursorKeys();
@@ -355,6 +398,12 @@ function createEndScene() {
       const h = this.scale.height;
 
       const bg = this.add.image(0, 0, "background").setOrigin(0).setDisplaySize(w, h);
+      this.scale.on('resize', (gameSize) => {
+      const width = gameSize.width;
+      const height = gameSize.height;
+      bg.setDisplaySize(width, height);
+    }, this);
+
       bg.setAlpha(0);
       this.tweens.add({
         targets: bg,
