@@ -120,6 +120,14 @@ menuMusic.volume = 0.4;
       scene.bg.setDisplaySize(window.innerWidth, window.innerHeight);
     }
   }
+
+  const controls = document.getElementById("touch-controls");
+if (window.innerWidth < 700) {
+  controls.style.transform = "scale(0.8) translateX(-50%)";
+} else {
+  controls.style.transform = "scale(1) translateX(-50%)";
+}
+
 });
 
 
@@ -298,6 +306,33 @@ menuMusic.volume = 0.4;
             SPACE: Phaser.Input.Keyboard.KeyCodes.SPACE,
             R: Phaser.Input.Keyboard.KeyCodes.R
           });
+
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      if (isMobile) {
+      document.getElementById("touch-controls").style.display = "flex";
+
+      const leftBtn = document.getElementById("btn-left");
+      const rightBtn = document.getElementById("btn-right");
+      const jumpBtn = document.getElementById("btn-jump");
+
+      this.mobile = { left: false, right: false, jump: false };
+
+      const setHold = (btn, key) => {
+        btn.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        this.mobile[key] = true;
+      });
+        btn.addEventListener("touchend", (e) => {
+        e.preventDefault();
+        this.mobile[key] = false;
+      });
+    };
+
+      setHold(leftBtn, "left");
+      setHold(rightBtn, "right");
+      setHold(jumpBtn, "jump");
+    }
+
         },
 
         update: function () {
@@ -308,18 +343,68 @@ menuMusic.volume = 0.4;
           }
 
           const speed = 200;
-          const jumpSpeed = -620;
-          const onFloor = this.player.body.blocked.down || this.player.body.touching.down;
+const jumpSpeed = -620;
+const onFloor = this.player.body.blocked.down || this.player.body.touching.down;
 
-          if (this.cursors.left.isDown || this.keys.A.isDown) {
-            this.player.setVelocityX(-speed);
-            this.player.flipX = true;
-          } else if (this.cursors.right.isDown || this.keys.D.isDown) {
-            this.player.setVelocityX(speed);
-            this.player.flipX = false;
-          } else {
-            this.player.setVelocityX(0);
-          }
+if (this.cursors.left.isDown || this.keys.A.isDown || (this.mobile && this.mobile.left)) {
+  this.player.setVelocityX(-speed);
+  this.player.flipX = true;
+
+  if (onFloor && !this.isRunning) {
+    this.isRunning = true;
+    this.runTween = this.tweens.add({
+      targets: this.player,
+      y: this.player.y - 6,
+      duration: 120,
+      yoyo: true,
+      repeat: -1,
+      ease: "Sine.easeInOut"
+    });
+  }
+
+} else if (this.cursors.right.isDown || this.keys.D.isDown || (this.mobile && this.mobile.right)) {
+  this.player.setVelocityX(speed);
+  this.player.flipX = false;
+
+  if (onFloor && !this.isRunning) {
+    this.isRunning = true;
+    this.runTween = this.tweens.add({
+      targets: this.player,
+      y: this.player.y - 6,
+      duration: 120,
+      yoyo: true,
+      repeat: -1,
+      ease: "Sine.easeInOut"
+    });
+  }
+
+} else {
+  this.player.setVelocityX(0);
+
+  if (this.isRunning) {
+    this.runTween.stop();
+    this.isRunning = false;
+    this.player.y = Math.round(this.player.y);
+  }
+}
+
+if ((this.cursors.up.isDown || this.keys.W.isDown || this.keys.SPACE.isDown || (this.mobile && this.mobile.jump)) && onFloor) {
+  this.player.setVelocityY(jumpSpeed);
+  this.jumpSound.play();
+
+  if (this.isRunning) {
+    this.runTween.stop();
+    this.isRunning = false;
+    this.player.y = Math.round(this.player.y);
+  }
+}
+
+if (!onFloor && this.isRunning) {
+  this.runTween.stop();
+  this.isRunning = false;
+  this.player.y = Math.round(this.player.y);
+}
+
 
           if ((this.cursors.up.isDown || this.keys.W.isDown || this.keys.SPACE.isDown) && onFloor) {
             this.player.setVelocityY(jumpSpeed);
